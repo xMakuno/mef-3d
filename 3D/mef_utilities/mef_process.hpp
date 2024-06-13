@@ -4,10 +4,18 @@ float calculate_local_area(float x1, float y1, float x2, float y2, float x3, flo
 }
 
 //TODO: add calculate_local_volume function to calculate an elements volume
+float calculate_local_volume(){
+    // This is a 4x4 matrix determinant
+    // return ((V==0)?0.000001:V)
+}
 
-float calculate_local_jacobian(float x1, float y1, float x2, float y2, float x3, float y3){
+//TODO: update local jacobian function to include the Z axis
+// DONE
+float calculate_local_jacobian(float x1, float y1, float z1, float x2,  float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4){
     //TODO: Change jacobian formula to insanely big formular
-    float J = (x2 - x1)*(y3 - y1) - (x3 - x1)*(y2 - y1);
+    float J = (x2-x1)*(y3-y1)*(z4-z1) + (y2-y1)*(z3-z1)*(x4-x1) + (x3-x1)*(y4-y1)*(z2-z1)
+                - (z2-z1)*(y3-y1)*(x4-x1) - (x3-x1)*(y2-y1)*(z4-z1) - (z3-z1)*(y4-y1)*(x2-x1);
+    // float J = (x2 - x1)*(y3 - y1) - (x3 - x1)*(y2 - y1);
     return ((J==0)?0.000001:J);
 }
 
@@ -17,9 +25,11 @@ float calculate_local_jacobian(float x1, float y1, float x2, float y2, float x3,
     -1 0 1 0
     -1 0 0 1
  */
+// DONE
 void calculate_B(Matrix* B){
-    B->set(-1,0,0);  B->set(1,0,1);  B->set(0,0,2);
-    B->set(-1,1,0);  B->set(0,1,1);  B->set(1,1,2);
+    B->set(-1,0,0);  B->set(1,0,1);  B->set(0,0,2);  B->set(0,0,3);
+    B->set(-1,1,0);  B->set(0,1,1);  B->set(1,1,2);  B->set(0,1,3);
+    B->set(-1,2,0);  B->set(0,2,1);  B->set(0,2,2);  B->set(1,2,3);
 }
 
 //TODO: change function to meet the dimensions of new A matrix in 3d
@@ -40,12 +50,13 @@ void create_local_K(Matrix* K, int element_id, Mesh* M){
           x3 = M->get_element(element_id)->get_node3()->get_x_coordinate(), y3 = M->get_element(element_id)->get_node3()->get_y_coordinate();
     //TODO: update to implemente volume function
     float Area = calculate_local_area(x1, y1, x2, y2, x3, y3);
-    //TODO update to implement new jacobian function
+    //TODO update to implement new jacobian function & add new
     float J = calculate_local_jacobian(x1, y1, x2, y2, x3, y3);
     
     //TODO: change matrices declaration to meet new dimensions
     Matrix B(2,3), A(2,2);
     calculate_B(&B);
+    //TODO: update number of arguments with the new coordinates
     calculate_local_A(&A, x1, y1, x2, y2, x3, y3);
     //B.show(); A.show();
 
@@ -59,6 +70,7 @@ void create_local_K(Matrix* K, int element_id, Mesh* M){
     product_matrix_by_matrix(&A,&B,&res1);
     product_matrix_by_matrix(&At,&res1,&res2);
     product_matrix_by_matrix(&Bt,&res2,&res3);
+    //Update formula to pass in the Volume
     product_scalar_by_matrix(k*Area/(J*J),&res3,3,3,K);
 
     //cout << "\t\tLocal matrix created for Element " << element_id+1 << ": "; K->show(); cout << "\n";
@@ -69,10 +81,11 @@ void create_local_b(Vector* b, int element_id, Mesh* M){
     b->set_size(3);
 
     float Q = M->get_problem_data(HEAT_SOURCE);
-    //TODO: add 
+    //TODO: add new coorddinates x4 and y4 and all z coordinates
     float x1 = M->get_element(element_id)->get_node1()->get_x_coordinate(), y1 = M->get_element(element_id)->get_node1()->get_y_coordinate(),
           x2 = M->get_element(element_id)->get_node2()->get_x_coordinate(), y2 = M->get_element(element_id)->get_node2()->get_y_coordinate(),
           x3 = M->get_element(element_id)->get_node3()->get_x_coordinate(), y3 = M->get_element(element_id)->get_node3()->get_y_coordinate();
+    //TODO: update the parameters that are passed in the function
     float J = calculate_local_jacobian(x1, y1, x2, y2, x3, y3);
 
     //TODO: update b formula to Q*J / 24 and add a 4th row in local b matrix
