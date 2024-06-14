@@ -4,18 +4,72 @@ float calculate_local_area(float x1, float y1, float x2, float y2, float x3, flo
 }
 
 //TODO: add calculate_local_volume function to calculate an elements volume
+//DONE
 float calculate_local_volume(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4){
     // This is a 4x4 matrix determinant
-    // float V;
-    // return ((V==0)?0.000001:V)
+    /*
+        x1 y1 z1 1    
+        x2 y2 z2 1    
+        x3 y3 z3 1    
+        x4 y4 z4 1
+
+        A
+        y2 z2 1    
+        y3 z3 1    
+        y4 z4 1
+
+        B
+        x2 z2 1
+        x3 z3 1
+        x4 z4 1
+
+        C
+        x2 y2 1
+        x3 y3 1
+        x4 y4 1
+
+        D
+        x2 y2 z2    
+        x3 y3 z3    
+        x4 y4 z4
+    */
+   /* float detA = y2*z3 + y3*z4 + y4*z2 - y4*z3 - y2*z4 - y3*z2;
+   float detB = x2*z3 + x3*z4 + x4*z2 - x4*z3 - x2*z4 - x3*z2;
+   float detC = x2*y3 + x3*y4 + x4*y2 - x4*y3 - x2*y4 - x3*y2; 
+   float detD = x2*y3*z4 + x3*y4*z2 + x4*y2*z3 - x4*y3*z2 - x2*y4*z3 - x3*y2*z4;
+   */
+   float detA = y2*(z3-z4) - z2*(y3-y4) + ((y3*z4)-(y4*z3));
+   float detB = x2*(z3-z4) - z2*(x3-x4) + ((x3*z4)-(x4*z3));
+   float detC = x2*(y3-y4) - y2*(x3-x4) + ((x3*y4)-(x4*y3));
+   float detD = x2*((y3*z4)-(y4*z3)) - y2*((x3*z4)*(x4*z3)) + z2*((x3*y4)-(x4*y3));
+   float V = abs(x1*detA - y1*detB* + z1*detC - detD)/6;
+   
+   return ((V==0)?0.000001:V);
 }
 
 //TODO: update local jacobian function to include the Z axis
 // DONE
 float calculate_local_jacobian(float x1, float y1, float z1, float x2,  float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4){
-    //TODO: Change jacobian formula to insanely big formular
-    float J = (x2-x1)*(y3-y1)*(z4-z1) + (y2-y1)*(z3-z1)*(x4-x1) + (x3-x1)*(y4-y1)*(z2-z1)
-                - (z2-z1)*(y3-y1)*(x4-x1) - (x3-x1)*(y2-y1)*(z4-z1) - (z3-z1)*(y4-y1)*(x2-x1);
+    //TODO: Change jacobian formula to insanely big formula
+    /*
+        x21 x31 x41
+        y21 y31 y41
+        z21 z31 z41
+
+        A
+        y31 y41
+        z31 z41
+        B
+        y21 y41
+        z21 z41
+        C
+        y21 y31
+        z21 z31
+    */
+    float detA = (y3-y1)*(z4-z1) - (y4-y1)*(z3-z1);
+    float detB = (y2-y1)*(z4-z1) - (y4-y1)*(z2-z1);
+    float detC = (y2-y1)*(z3-z1) - (y3-y1)*(z2-z1);
+    float J = (x2-x1)*detA + (x1-x3)*detB + (x4-x1)*detC;
     // float J = (x2 - x1)*(y3 - y1) - (x3 - x1)*(y2 - y1);
     return ((J==0)?0.000001:J);
 }
@@ -34,9 +88,23 @@ void calculate_B(Matrix* B){
 }
 
 //TODO: change function to meet the dimensions of new A matrix in 3d
-void calculate_local_A(Matrix* A, float x1, float y1, float x2, float y2, float x3, float y3){
-    A->set(y3-y1, 0, 0);   A->set(x1-x3, 0, 1);
-    A->set(y1-y2, 1, 0);   A->set(x2-x1, 1, 1);
+// DONE
+void calculate_local_A(Matrix* A, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4){
+    /* A->set(y3-y1, 0, 0);   A->set(x1-x3, 0, 1);  
+    A->set(y1-y2, 1, 0);   A->set(x2-x1, 1, 1); */
+    float a = (y3-y1)*(z4-z1) - (y4-y1)*(z3-z1);
+    float b = (x4-x1)*(z3-z1) - (x3-x1)*(z4-z1);
+    float c = (x3-x1)*(y4-y1) - (x4-x1)*(y3-y1);
+    float d = (y4-y1)*(z2-z1) - (y2-y1)*(z4-z1);
+    float e = (x2-x1)*(z4-z1) - (x4-x1)*(z2-z1);
+    float f = (x4-x1)*(y2-y1) - (x2-x1)*(y4-y1);
+    float g = (y2-y1)*(z3-z1) - (y3-y1)*(z2-z1); 
+    float h = (x3-x1)*(z2-z1) - (x2-x1)*(z3-z1);
+    float i = (x2-x1)*(y3-y1) - (x3-x1)*(y2-y1);
+
+    A->set(a,0,0);A->set(d,0,1);A->set(g,0,2);
+    A->set(b,1,0);A->set(e,1,1);A->set(h,1,2);
+    A->set(c,2,0);A->set(f,2,1);A->set(i,2,2);
 }
 
 //TODO: change function to implement all changes to new K matrices
@@ -56,6 +124,7 @@ void create_local_K(Matrix* K, int element_id, Mesh* M){
     // DONE
     // float Area = calculate_local_area(x1, y1, x2, y2, x3, y3);
     float Volume = calculate_local_volume(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4);
+    cout << "\tVolume: " << Volume << endl;
     float J = calculate_local_jacobian(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4);
     
     //TODO: change matrices declaration to meet new dimensions
@@ -63,14 +132,14 @@ void create_local_K(Matrix* K, int element_id, Mesh* M){
     Matrix B(3,4), A(3,3);
     calculate_B(&B);
     //TODO: update number of arguments with the new coordinates
-    calculate_local_A(&A, x1, y1, x2, y2, x3, y3);
+    calculate_local_A(&A, x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4);
     //B.show(); A.show();
 
     //TODO: change dimensions in these matrices to meet the new dimensions
     //DONE
     Matrix Bt(4,3), At(3,3);
-    transpose(&B,2,3,&Bt);
-    transpose(&A,2,2,&At);
+    transpose(&B,3,4,&Bt);
+    transpose(&A,3,3,&At);
     //Bt.show(); At.show();
 
     Matrix res1, res2, res3;
