@@ -97,11 +97,12 @@ class Mesh {
             cout << "Number of neumann boundary conditions: " << quantities[NUM_NEUMANN] << "\n\n";
             cout << "List of nodes\n**********************\n";
             for(int i = 0; i < quantities[NUM_NODES]; i++)
-                cout << "Node: " << nodes[i]->get_ID() << ", x= " << nodes[i]->get_x_coordinate() << ", y= " << nodes[i]->get_y_coordinate() << "\n";
+                cout << "Node: " << nodes[i]->get_ID() << ", x= " << nodes[i]->get_x_coordinate() << ", y= " << nodes[i]->get_y_coordinate() << ", z= " << nodes[i]->get_z_coordinate() << "\n";
             cout << "\nList of elements\n**********************\n";
             for(int i = 0; i < quantities[NUM_ELEMENTS]; i++){
                 cout << "Element: " << elements[i]->get_ID() << ", Node 1= " << elements[i]->get_node1()->get_ID();
-                cout << ", Node 2= " << elements[i]->get_node2()->get_ID() << ", Node 3= " << elements[i]->get_node3()->get_ID() << "\n";
+                cout << ", Node 2= " << elements[i]->get_node2()->get_ID() << ", Node 3= " << elements[i]->get_node3()->get_ID();
+                cout << ", Node 4= " << elements[i]->get_node4()->get_ID() << "\n";
             }
             cout << "\nList of Dirichlet boundary conditions\n**********************\n";
             for(int i = 0; i < quantities[NUM_DIRICHLET]; i++)
