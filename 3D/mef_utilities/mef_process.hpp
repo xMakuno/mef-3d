@@ -51,6 +51,7 @@ float calculate_local_volume(float x1, float y1, float z1, float x2, float y2, f
 // DONE
 float calculate_local_jacobian(float x1, float y1, float z1, float x2,  float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4){
     //TODO: Change jacobian formula to insanely big formula
+    // DONE
     /*
         x21 x31 x41
         y21 y31 y41
@@ -171,10 +172,10 @@ void create_local_b(Vector* b, int element_id, Mesh* M){
 
     // TODO: update b formula to Q*J / 24 and add a 4th row in local b matrix
     // DONE
-    b->set(Q*J/24, 0);
-    b->set(Q*J/24, 1);
-    b->set(Q*J/24, 2);
-    b->set(Q*J/24, 3);
+    b->set(Q*J/24.0f, 0);
+    b->set(Q*J/24.0f, 1);
+    b->set(Q*J/24.0f, 2);
+    b->set(Q*J/24.0f, 3);
 
     //cout << "\t\tLocal vector created for Element " << element_id+1 << ": "; b->show(); cout << "\n";
 }
