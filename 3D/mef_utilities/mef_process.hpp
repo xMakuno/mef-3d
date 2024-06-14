@@ -4,8 +4,9 @@ float calculate_local_area(float x1, float y1, float x2, float y2, float x3, flo
 }
 
 //TODO: add calculate_local_volume function to calculate an elements volume
-float calculate_local_volume(){
+float calculate_local_volume(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4){
     // This is a 4x4 matrix determinant
+    // float V;
     // return ((V==0)?0.000001:V)
 }
 
@@ -41,27 +42,33 @@ void calculate_local_A(Matrix* A, float x1, float y1, float x2, float y2, float 
 //TODO: change function to implement all changes to new K matrices
 void create_local_K(Matrix* K, int element_id, Mesh* M){
     //TODO: change dimensions to 4 by 4
-    K->set_size(3,3);
+    // DONE
+    K->set_size(4,4);
 
     float k = M->get_problem_data(THERMAL_CONDUCTIVITY);
     //TODO: add new coordinates for K matrix
-    float x1 = M->get_element(element_id)->get_node1()->get_x_coordinate(), y1 = M->get_element(element_id)->get_node1()->get_y_coordinate(),
-          x2 = M->get_element(element_id)->get_node2()->get_x_coordinate(), y2 = M->get_element(element_id)->get_node2()->get_y_coordinate(),
-          x3 = M->get_element(element_id)->get_node3()->get_x_coordinate(), y3 = M->get_element(element_id)->get_node3()->get_y_coordinate();
+    // DONE
+    float x1 = M->get_element(element_id)->get_node1()->get_x_coordinate(), y1 = M->get_element(element_id)->get_node1()->get_y_coordinate(), z1 = M->get_element(element_id)->get_node1()->get_z_coordinate(),
+          x2 = M->get_element(element_id)->get_node2()->get_x_coordinate(), y2 = M->get_element(element_id)->get_node2()->get_y_coordinate(), z2 = M->get_element(element_id)->get_node2()->get_z_coordinate(),
+          x3 = M->get_element(element_id)->get_node3()->get_x_coordinate(), y3 = M->get_element(element_id)->get_node3()->get_y_coordinate(), z3 = M->get_element(element_id)->get_node3()->get_z_coordinate(),
+          x4 = M->get_element(element_id)->get_node4()->get_x_coordinate(), y4 = M->get_element(element_id)->get_node4()->get_y_coordinate(), z4 = M->get_element(element_id)->get_node4()->get_z_coordinate();
     //TODO: update to implemente volume function
-    float Area = calculate_local_area(x1, y1, x2, y2, x3, y3);
-    //TODO update to implement new jacobian function & add new
-    float J = calculate_local_jacobian(x1, y1, x2, y2, x3, y3);
+    // DONE
+    // float Area = calculate_local_area(x1, y1, x2, y2, x3, y3);
+    float Volume = calculate_local_volume(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4);
+    float J = calculate_local_jacobian(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4);
     
     //TODO: change matrices declaration to meet new dimensions
-    Matrix B(2,3), A(2,2);
+    // DONE
+    Matrix B(3,4), A(3,3);
     calculate_B(&B);
     //TODO: update number of arguments with the new coordinates
     calculate_local_A(&A, x1, y1, x2, y2, x3, y3);
     //B.show(); A.show();
 
     //TODO: change dimensions in these matrices to meet the new dimensions
-    Matrix Bt(3,2), At(2,2);
+    //DONE
+    Matrix Bt(4,3), At(3,3);
     transpose(&B,2,3,&Bt);
     transpose(&A,2,2,&At);
     //Bt.show(); At.show();
@@ -70,28 +77,35 @@ void create_local_K(Matrix* K, int element_id, Mesh* M){
     product_matrix_by_matrix(&A,&B,&res1);
     product_matrix_by_matrix(&At,&res1,&res2);
     product_matrix_by_matrix(&Bt,&res2,&res3);
-    //Update formula to pass in the Volume
-    product_scalar_by_matrix(k*Area/(J*J),&res3,3,3,K);
+    // TODO: Update formula to pass in the Volume & update dimensions
+    // DONE
+    product_scalar_by_matrix(k*Volume/(J*J),&res3,4,4,K);
 
     //cout << "\t\tLocal matrix created for Element " << element_id+1 << ": "; K->show(); cout << "\n";
 }
 
 void create_local_b(Vector* b, int element_id, Mesh* M){
     //TODO: update local B size to 4
-    b->set_size(3);
+    // DONE
+    b->set_size(4);
 
     float Q = M->get_problem_data(HEAT_SOURCE);
     //TODO: add new coorddinates x4 and y4 and all z coordinates
-    float x1 = M->get_element(element_id)->get_node1()->get_x_coordinate(), y1 = M->get_element(element_id)->get_node1()->get_y_coordinate(),
-          x2 = M->get_element(element_id)->get_node2()->get_x_coordinate(), y2 = M->get_element(element_id)->get_node2()->get_y_coordinate(),
-          x3 = M->get_element(element_id)->get_node3()->get_x_coordinate(), y3 = M->get_element(element_id)->get_node3()->get_y_coordinate();
+    // DONE
+    float x1 = M->get_element(element_id)->get_node1()->get_x_coordinate(), y1 = M->get_element(element_id)->get_node1()->get_y_coordinate(), z1 = M->get_element(element_id)->get_node1()->get_z_coordinate(),
+          x2 = M->get_element(element_id)->get_node2()->get_x_coordinate(), y2 = M->get_element(element_id)->get_node2()->get_y_coordinate(), z2 = M->get_element(element_id)->get_node2()->get_z_coordinate(),
+          x3 = M->get_element(element_id)->get_node3()->get_x_coordinate(), y3 = M->get_element(element_id)->get_node3()->get_y_coordinate(), z3 = M->get_element(element_id)->get_node3()->get_z_coordinate(),
+          x4 = M->get_element(element_id)->get_node4()->get_x_coordinate(), y4 = M->get_element(element_id)->get_node4()->get_y_coordinate(), z4 = M->get_element(element_id)->get_node4()->get_z_coordinate();
     //TODO: update the parameters that are passed in the function
-    float J = calculate_local_jacobian(x1, y1, x2, y2, x3, y3);
+    // DONE
+    float J = calculate_local_jacobian(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4);
 
-    //TODO: update b formula to Q*J / 24 and add a 4th row in local b matrix
-    b->set(Q*J/6,0);
-    b->set(Q*J/6,1);
-    b->set(Q*J/6,2);
+    // TODO: update b formula to Q*J / 24 and add a 4th row in local b matrix
+    // DONE
+    b->set(Q*J/24, 0);
+    b->set(Q*J/24, 1);
+    b->set(Q*J/24, 2);
+    b->set(Q*J/24, 3);
 
     //cout << "\t\tLocal vector created for Element " << element_id+1 << ": "; b->show(); cout << "\n";
 }
@@ -106,17 +120,21 @@ void create_local_systems(Matrix* Ks, Vector* bs, int num_elements, Mesh* M){
 
 //TODO: add new row and column to meet new dimensions of 4
 //TODO: add index4 to parameters
-void assembly_K(Matrix* K, Matrix* local_K, int index1, int index2, int index3){
-    K->add(local_K->get(0,0),index1,index1);    K->add(local_K->get(0,1),index1,index2);    K->add(local_K->get(0,2),index1,index3);
-    K->add(local_K->get(1,0),index2,index1);    K->add(local_K->get(1,1),index2,index2);    K->add(local_K->get(1,2),index2,index3);
-    K->add(local_K->get(2,0),index3,index1);    K->add(local_K->get(2,1),index3,index2);    K->add(local_K->get(2,2),index3,index3);
+// DONE
+void assembly_K(Matrix* K, Matrix* local_K, int index1, int index2, int index3, int index4){
+    K->add(local_K->get(0,0),index1,index1);    K->add(local_K->get(0,1),index1,index2);    K->add(local_K->get(0,2),index1,index3);    K->add(local_K->get(0,3),index1,index4);
+    K->add(local_K->get(1,0),index2,index1);    K->add(local_K->get(1,1),index2,index2);    K->add(local_K->get(1,2),index2,index3);    K->add(local_K->get(1,3),index2,index4);
+    K->add(local_K->get(2,0),index3,index1);    K->add(local_K->get(2,1),index3,index2);    K->add(local_K->get(2,2),index3,index3);    K->add(local_K->get(2,3),index3,index4);
+    K->add(local_K->get(3,0),index4,index1);    K->add(local_K->get(3,1),index4,index2);    K->add(local_K->get(3,2),index4,index3);    K->add(local_K->get(3,3),index4,index4);
 }
 
 //TODO: add 4th row to calculation
-void assembly_b(Vector* b, Vector* local_b, int index1, int index2, int index3){
+// DONE
+void assembly_b(Vector* b, Vector* local_b, int index1, int index2, int index3, int index4){
     b->add(local_b->get(0),index1);
     b->add(local_b->get(1),index2);
     b->add(local_b->get(2),index3);
+    b->add(local_b->get(3),index4);
 }
 
 
@@ -130,9 +148,10 @@ void assembly(Matrix* K, Vector* b, Matrix* Ks, Vector* bs, int num_elements, Me
         int index1 = M->get_element(e)->get_node1()->get_ID() - 1;
         int index2 = M->get_element(e)->get_node2()->get_ID() - 1;
         int index3 = M->get_element(e)->get_node3()->get_ID() - 1;
-
-        assembly_K(K, &Ks[e], index1, index2, index3);
-        assembly_b(b, &bs[e], index1, index2, index3);
+        int index4 = M->get_element(e)->get_node4()->get_ID() - 1;
+        // TODO: pass index4 to functions
+        assembly_K(K, &Ks[e], index1, index2, index3, index4);
+        assembly_b(b, &bs[e], index1, index2, index3, index4);
         //cout << "\t\t"; K->show(); cout << "\t\t"; b->show(); cout << "\n";
     }
 }
