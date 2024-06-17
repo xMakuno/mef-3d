@@ -33,23 +33,19 @@ float calculate_local_volume(float x1, float y1, float z1, float x2, float y2, f
         x3 y3 z3    
         x4 y4 z4
     */
-   /* float detA = y2*z3 + y3*z4 + y4*z2 - y4*z3 - y2*z4 - y3*z2;
-   float detB = x2*z3 + x3*z4 + x4*z2 - x4*z3 - x2*z4 - x3*z2;
-   float detC = x2*y3 + x3*y4 + x4*y2 - x4*y3 - x2*y4 - x3*y2; 
-   float detD = x2*y3*z4 + x3*y4*z2 + x4*y2*z3 - x4*y3*z2 - x2*y4*z3 - x3*y2*z4;
-   */
-   float detA = y2*(z3-z4) - z2*(y3-y4) + ((y3*z4)-(y4*z3));
-   float detB = x2*(z3-z4) - z2*(x3-x4) + ((x3*z4)-(x4*z3));
-   float detC = x2*(y3-y4) - y2*(x3-x4) + ((x3*y4)-(x4*y3));
-   float detD = x2*((y3*z4)-(y4*z3)) - y2*((x3*z4)*(x4*z3)) + z2*((x3*y4)-(x4*y3));
-   float V = abs(x1*detA - y1*detB* + z1*detC - detD)/6;
-   
-   return ((V==0)?0.000001:V);
+    float detA = y2*(z3-z4) - z2*(y3-y4) + y3*z4 - y4*z3;
+    float detB = x2*(z3-z4) - z2*(x3-x4) + x3*z4 - x4*z3;
+    float detC = x2*(y3-y4) - y2*(x3-x4) + x3*y4 - x4*y3;
+    float detD = x2*(y3*z4 - y4*z3) - y2*(x3*z4 - x4*z3) + z2*(x3*y4 - x4*y3);
+    float V = abs(x1*detA - y1*detB + z1*detC - detD) / 6.0;
+    return (V == 0) ? 0.000001 : V;
 }
 
 //TODO: update local jacobian function to include the Z axis
 // DONE
 float calculate_local_jacobian(float x1, float y1, float z1, float x2,  float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4){
+    // float J = (x2 - x1)*(y3 - y1) - (x3 - x1)*(y2 - y1);
+
     //TODO: Change jacobian formula to insanely big formula
     // DONE
     /*
@@ -71,7 +67,6 @@ float calculate_local_jacobian(float x1, float y1, float z1, float x2,  float y2
     float detB = (y2-y1)*(z4-z1) - (y4-y1)*(z2-z1);
     float detC = (y2-y1)*(z3-z1) - (y3-y1)*(z2-z1);
     float J = (x2-x1)*detA + (x1-x3)*detB + (x4-x1)*detC;
-    // float J = (x2 - x1)*(y3 - y1) - (x3 - x1)*(y2 - y1);
     return ((J==0)?0.000001:J);
 }
 
@@ -89,10 +84,16 @@ void calculate_B(Matrix* B){
 }
 
 //TODO: change function to meet the dimensions of new A matrix in 3d
+/*
+
+
+*/
 // DONE
 void calculate_local_A(Matrix* A, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4){
     /* A->set(y3-y1, 0, 0);   A->set(x1-x3, 0, 1);  
     A->set(y1-y2, 1, 0);   A->set(x2-x1, 1, 1); */
+
+    //Calculating Matrix A cells
     float a = (y3-y1)*(z4-z1) - (y4-y1)*(z3-z1);
     float b = (x4-x1)*(z3-z1) - (x3-x1)*(z4-z1);
     float c = (x3-x1)*(y4-y1) - (x4-x1)*(y3-y1);
@@ -102,10 +103,10 @@ void calculate_local_A(Matrix* A, float x1, float y1, float z1, float x2, float 
     float g = (y2-y1)*(z3-z1) - (y3-y1)*(z2-z1); 
     float h = (x3-x1)*(z2-z1) - (x2-x1)*(z3-z1);
     float i = (x2-x1)*(y3-y1) - (x3-x1)*(y2-y1);
-
-    A->set(a,0,0);A->set(d,0,1);A->set(g,0,2);
-    A->set(b,1,0);A->set(e,1,1);A->set(h,1,2);
-    A->set(c,2,0);A->set(f,2,1);A->set(i,2,2);
+    //Transposing
+    A->set(a,0,0);A->set(b,0,1);A->set(c,0,2);
+    A->set(d,1,0);A->set(e,1,1);A->set(f,1,2);
+    A->set(g,2,0);A->set(h,2,1);A->set(i,2,2);
 }
 
 //TODO: change function to implement all changes to new K matrices
