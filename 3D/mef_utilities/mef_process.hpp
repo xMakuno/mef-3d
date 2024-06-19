@@ -126,7 +126,7 @@ void create_local_K(Matrix* K, int element_id, Mesh* M){
     // DONE
     // float Area = calculate_local_area(x1, y1, x2, y2, x3, y3);
     float Volume = calculate_local_volume(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4);
-    cout << "\tVolume: " << Volume << endl;
+    //cout << "\tVolume: " << Volume << endl;
     float J = calculate_local_jacobian(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4);
     
     //TODO: change matrices declaration to meet new dimensions
